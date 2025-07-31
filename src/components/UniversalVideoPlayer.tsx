@@ -90,27 +90,18 @@ const UniversalVideoPlayer: React.FC<UniversalVideoPlayerProps> = ({
       return src;
     }
     
-    // Detectar se é um caminho local do servidor
+    // Para todos os arquivos locais, usar o proxy do backend
     if (src.startsWith('/content')) {
-      return src;
+      return src; // Já está no formato correto
     }
     
     if (src.startsWith('/') || src.includes('content/')) {
-      // Construir URL para o proxy do backend
       const cleanPath = src.startsWith('/content') ? src : `/content${src}`;
       return cleanPath;
     }
     
-    // Para arquivos de vídeo diretos, criar URL externa para Wowza
-    if (src.includes('.mp4') || src.includes('.avi') || src.includes('.mov')) {
-      const isProduction = window.location.hostname !== 'localhost';
-      const wowzaHost = isProduction ? 'samhost.wcore.com.br' : '51.222.156.223';
-      
-      // Tentar URL direta do Wowza na porta 6980
-      return `http://${wowzaHost}:6980/content${src.startsWith('/') ? src : `/${src}`}`;
-    }
-    
-    return src;
+    // Para caminhos relativos, adicionar /content
+    return `/content/${src.replace(/^\/+/, '')}`;
   };
 
   // Função para detectar tipo de arquivo

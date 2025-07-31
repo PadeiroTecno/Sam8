@@ -89,13 +89,13 @@ const Players: React.FC = () => {
       type: 'iframe',
       features: ['Fácil Incorporação', 'Responsivo', 'Seguro', 'Cross-domain'],
       code: `<iframe 
-  src="http://samhost.wcore.com.br:6980/player/iframe?stream=${userLogin}_live" 
+ src="/api/players/iframe?stream=${userLogin}_live" 
   width="640" 
   height="360" 
   frameborder="0" 
   allowfullscreen>
 </iframe>`,
-      previewUrl: `http://samhost.wcore.com.br:6980/player/iframe?stream=${userLogin}_live`,
+      previewUrl: `/api/players/iframe?stream=${userLogin}_live`,
       isActive: false
     },
     {
@@ -152,14 +152,14 @@ const Players: React.FC = () => {
       type: 'facebook',
       features: ['Facebook Live', 'Social Media', 'Compartilhamento', 'Embeds'],
       code: `<div class="fb-video" 
-     data-href="http://samhost.wcore.com.br/player/social?stream=${userLogin}_live" 
+     data-href="/api/players/social?stream=${userLogin}_live" 
      data-width="640" 
      data-show-text="false">
 </div>
 <script async defer crossorigin="anonymous" 
         src="https://connect.facebook.net/pt_BR/sdk.js#xfbml=1&version=v18.0">
 </script>`,
-      previewUrl: `http://samhost.wcore.com.br/player/social?stream=${userLogin}_live`,
+      previewUrl: `/api/players/social?stream=${userLogin}_live`,
       isActive: false
     },
     {
@@ -261,14 +261,7 @@ player.play();`,
         return (
           <div className="h-48 bg-gray-900 rounded-lg overflow-hidden">
             <iframe
-              src={`data:text/html,<html><body style="margin:0;background:#000;display:flex;align-items:center;justify-content:center;color:white;font-family:Arial">
-                <div style="text-align:center">
-                  <div style="width:60px;height:60px;border:3px solid white;border-radius:50%;border-top-color:transparent;animation:spin 1s linear infinite;margin:0 auto 20px"></div>
-                  <div>Player iFrame Ativo</div>
-                  <div style="font-size:12px;opacity:0.7;margin-top:10px">Carregando stream...</div>
-                </div>
-                <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-              </body></html>`}
+              src={`/api/players/iframe?stream=${userLogin}_live`}
               className="w-full h-full border-0"
               title="iFrame Player Preview"
             />
@@ -404,6 +397,14 @@ player.play();`,
                   Testar com Vídeo
                 </button>
               )}
+              
+              <button
+                onClick={() => window.open(`/api/players/iframe?stream=${userLogin}_live`, '_blank')}
+                className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center justify-center"
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Abrir Player Externo
+              </button>
             </div>
           </div>
         </div>
@@ -466,6 +467,16 @@ player.play();`,
                 <Copy className="h-4 w-4 mr-2" />
                 Copiar Código
               </button>
+              
+              {(config.id === 'iframe' || config.id === 'facebook') && (
+                <button
+                  onClick={() => window.open(config.previewUrl, '_blank')}
+                  className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center justify-center"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Abrir Externamente
+                </button>
+              )}
             </div>
           </div>
         ))}
@@ -480,13 +491,24 @@ player.play();`,
             <div key={config.id} className="border border-gray-200 rounded-lg p-4">
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-medium text-gray-800">{config.name}</h3>
-                <button
-                  onClick={() => copyCode(config.code, config.name)}
-                  className="text-primary-600 hover:text-primary-800 flex items-center"
-                >
-                  <Copy className="h-4 w-4 mr-1" />
-                  Copiar
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => copyCode(config.code, config.name)}
+                    className="text-primary-600 hover:text-primary-800 flex items-center"
+                  >
+                    <Copy className="h-4 w-4 mr-1" />
+                    Copiar
+                  </button>
+                  {(config.id === 'iframe' || config.id === 'facebook') && (
+                    <button
+                      onClick={() => window.open(config.previewUrl, '_blank')}
+                      className="text-blue-600 hover:text-blue-800 flex items-center"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      Testar
+                    </button>
+                  )}
+                </div>
               </div>
               
               <pre className="bg-gray-50 p-3 rounded-md text-sm overflow-x-auto">

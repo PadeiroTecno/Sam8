@@ -683,21 +683,7 @@ export default function GerenciarVideos() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Abrir vídeo em nova aba para melhor compatibilidade
-                          const isProduction = window.location.hostname !== 'localhost';
-                          const wowzaHost = isProduction ? 'samhost.wcore.com.br' : '51.222.156.223';
-                          
-                          if (video.url) {
-                            let externalUrl = video.url;
-                            if (video.url.startsWith('/content')) {
-                              externalUrl = `http://${wowzaHost}:6980${video.url}`;
-                            } else if (!video.url.startsWith('http')) {
-                              externalUrl = `http://${wowzaHost}:6980/content/${video.url}`;
-                            }
-                            window.open(externalUrl, '_blank');
-                          } else {
-                            abrirModalVideo(video);
-                          }
+                          abrirModalVideo(video);
                         }}
                         title="Assistir vídeo"
                         className="hover:text-blue-800 transition-colors duration-200"

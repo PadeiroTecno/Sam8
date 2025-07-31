@@ -20,6 +20,7 @@
   const transmissionSettingsRoutes = require('./routes/transmission-settings');
   const ftpRoutes = require('./routes/ftp');
   const serversRoutes = require('./routes/servers');
+ const playersRoutes = require('./routes/players');
 
   const app = express();
   const PORT = process.env.PORT || 3001;
@@ -264,6 +265,7 @@
   app.use('/api/transmission-settings', transmissionSettingsRoutes);
   app.use('/api/ftp', ftpRoutes);
   app.use('/api/servers', serversRoutes);
+ app.use('/api/players', playersRoutes);
 
   // Rota de teste
   app.get('/api/test', (req, res) => {

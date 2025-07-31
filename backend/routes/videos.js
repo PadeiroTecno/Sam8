@@ -34,13 +34,19 @@ const upload = multer({
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = [
-      'video/mp4', 'video/avi', 'video/mov', 'video/wmv', 
+      'video/mp4', 'video/avi', 'video/quicktime', 'video/x-msvideo', 'video/wmv', 
       'video/flv', 'video/webm', 'video/mkv'
     ];
-    if (allowedTypes.includes(file.mimetype)) {
+    
+    // Verificar também por extensão para arquivos .mov
+    const fileName = file.originalname.toLowerCase();
+    const hasValidExtension = ['.mp4', '.avi', '.mov', '.wmv', '.flv', '.webm', '.mkv'].some(ext => 
+      fileName.endsWith(ext)
+    );
+    if (allowedTypes.includes(file.mimetype) || hasValidExtension) {
       cb(null, true);
     } else {
-      cb(new Error('Tipo de arquivo não suportado'), false);
+      cb(new Error(`Tipo de arquivo não suportado: ${file.mimetype}. Extensões aceitas: .mp4, .avi, .mov, .wmv, .flv, .webm, .mkv`), false);
     }
   }
 });
@@ -122,6 +128,10 @@ router.post('/upload', authMiddleware, upload.single('video'), async (req, res) 
     const userId = req.user.id;
     const userLogin = req.user.email.split('@')[0];
     const folderId = req.query.folder_id || 'default';
+    
+    console.log(`📤 Upload iniciado - Usuário: ${userLogin}, Pasta: ${folderId}, Arquivo: ${req.file.originalname}`);
+    console.log(`📋 Tipo MIME: ${req.file.mimetype}, Tamanho: ${req.file.size} bytes`);
+    
     const duracao = parseInt(req.body.duracao) || 0;
     const tamanho = parseInt(req.body.tamanho) || req.file.size;
 
@@ -134,17 +144,21 @@ router.post('/upload', authMiddleware, upload.single('video'), async (req, res) 
       [folderId, userId]
     );
     if (userRows.length === 0) {
+      console.log(`❌ Pasta ${folderId} não encontrada para usuário ${userId}`);
       return res.status(404).json({ error: 'Pasta não encontrada' });
     }
 
     const userData = userRows[0];
     const serverId = userData.codigo_servidor || 1;
     const folderName = userData.folder_name;
+    
+    console.log(`📁 Pasta encontrada: ${folderName}, Servidor: ${serverId}`);
 
     const spaceMB = Math.ceil(tamanho / (1024 * 1024));
     const availableSpace = userData.espaco - userData.espaco_usado;
 
     if (spaceMB > availableSpace) {
+      console.log(`❌ Espaço insuficiente: ${spaceMB}MB necessário, ${availableSpace}MB disponível`);
       await fs.unlink(req.file.path).catch(() => {});
       return res.status(400).json({ 
         error: `Espaço insuficiente. Necessário: ${spaceMB}MB, Disponível: ${availableSpace}MB` 

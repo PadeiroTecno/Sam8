@@ -430,25 +430,11 @@ const Playlists: React.FC = () => {
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            // Abrir vídeo em nova aba para melhor compatibilidade
-            const isProduction = window.location.hostname !== 'localhost';
-            const wowzaHost = isProduction ? 'samhost.wcore.com.br' : '51.222.156.223';
-            
-            if (video.url) {
-              let externalUrl = video.url;
-              if (video.url.startsWith('/content')) {
-                externalUrl = `http://${wowzaHost}:6980${video.url}`;
-              } else if (!video.url.startsWith('http')) {
-                externalUrl = `http://${wowzaHost}:6980/content/${video.url}`;
-              }
-              window.open(externalUrl, '_blank');
-            } else {
-              // Fallback para modal interno
-              setCurrentVideoUrl(buildVideoUrl(video.url));
-              setPlaylistVideosToPlay([video]);
-              setPlaylistPlayerIndex(0);
-              setVideoPlayerModalOpen(true);
-            }
+            // Abrir modal do player
+            setCurrentVideoUrl(buildVideoUrl(video.url || ''));
+            setPlaylistVideosToPlay([video]);
+            setPlaylistPlayerIndex(0);
+            setVideoPlayerModalOpen(true);
           }}
           className="text-blue-600 hover:text-blue-800 p-1"
           title="Assistir vídeo"
@@ -480,12 +466,10 @@ const Playlists: React.FC = () => {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              if (video.url) {
-                setCurrentVideoUrl(buildVideoUrl(video.url));
-                setPlaylistVideosToPlay([video]);
-                setPlaylistPlayerIndex(0);
-                setVideoPlayerModalOpen(true);
-              }
+              setCurrentVideoUrl(buildVideoUrl(video.url || ''));
+              setPlaylistVideosToPlay([video]);
+              setPlaylistPlayerIndex(0);
+              setVideoPlayerModalOpen(true);
             }}
             className="text-blue-600 hover:text-blue-800 p-1"
             title="Assistir vídeo"
